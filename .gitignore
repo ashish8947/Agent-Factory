@@ -1,0 +1,14 @@
+# Env (never commit secrets)
+.env
+
+# Go build outputs
+bin/
+*.exe
+*.out
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
