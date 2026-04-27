@@ -149,3 +149,45 @@ func extractJSON(input string) string {
 	}
 	return input[start : end+1]
 }
+
+func (c *OpenAIClient) CheckQuality(text string) (bool, error) {
+
+	prompt := `
+Check if the following GitHub issue is missing important debugging details.
+Reply ONLY with YES or NO.
+
+Issue:
+` + text
+
+	reqBody := openAIRequest{
+		Model: c.model,
+		Messages: []messageItem{
+			{Role: "user", Content: prompt},
+		},
+	}
+
+	bodyBytes, _ := json.Marshal(reqBody)
+
+	req, _ := http.NewRequest(
+		"POST",
+		"https://api.openai.com/v1/chat/completions",
+		bytes.NewBuffer(bodyBytes),
+	)
+
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	var result openAIResponse
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	content := result.Choices[0].Message.Content
+
+	return strings.Contains(strings.ToUpper(content), "YES"), nil
+}

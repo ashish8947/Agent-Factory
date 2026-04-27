@@ -109,3 +109,24 @@ func (c *Client) Comment(issueNumber int, comment string) error {
 
 	return nil
 }
+func (c *Client) FetchRecentIssues(limit int) ([]models.Issue, error) {
+
+	url := fmt.Sprintf(
+		"https://api.github.com/repos/%s/%s/issues?state=open&per_page=%d",
+		c.owner, c.repo, limit,
+	)
+
+	resp, err := c.makeRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var issues []models.Issue
+	err = json.NewDecoder(resp.Body).Decode(&issues)
+	if err != nil {
+		return nil, err
+	}
+
+	return issues, nil
+}
