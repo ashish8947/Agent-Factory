@@ -35,7 +35,8 @@ func (c *Client) makeRequest(method, url string, body io.Reader) (*http.Response
 
 	req.Header.Set("Authorization", "Bearer "+c.token)
 	req.Header.Set("Accept", "application/vnd.github+json")
-
+	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
+	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{Timeout: 20 * time.Second}
 
 	start := time.Now()
@@ -47,6 +48,12 @@ func (c *Client) makeRequest(method, url string, body io.Reader) (*http.Response
 
 	log.Printf("[GitHub] %s %s → status=%d duration=%s\n",
 		method, url, resp.StatusCode, time.Since(start))
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		log.Printf("[GitHub][ERROR] status=%d body=%s",
+			resp.StatusCode, string(bodyBytes))
+		return nil, fmt.Errorf("github API error: %d", resp.StatusCode)
+	}
 
 	return resp, nil
 }
@@ -122,9 +129,17 @@ func (c *Client) FetchRecentIssues(limit int) ([]models.Issue, error) {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		log.Printf("[GitHub][ERROR] status=%d response=%s\n",
+			resp.StatusCode, string(bodyBytes))
+		return nil, fmt.Errorf("github API error: %d", resp.StatusCode)
+	}
+
 	var issues []models.Issue
 	err = json.NewDecoder(resp.Body).Decode(&issues)
 	if err != nil {
+		log.Println("[GitHub][ERROR] Failed to decode issues:", err)
 		return nil, err
 	}
 
