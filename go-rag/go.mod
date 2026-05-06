@@ -1,0 +1,3 @@
+module go-rag
+
+go 1.25.7
