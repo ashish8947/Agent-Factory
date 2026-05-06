@@ -13,7 +13,7 @@ It combines:
 
 # 🏗️ System Overview
 
-Go-RAG is designed as a **modular, production-ready backend system** for building AI applications.
+Go-RAG is designed as a **modular backend system** for building AI applications.
 
 It supports:
 - Document ingestion
