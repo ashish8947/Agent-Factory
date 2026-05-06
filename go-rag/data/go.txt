@@ -1,0 +1,2 @@
+Go is a programming language created at Google.
+It is used for backend systems, cloud services, and distributed systems.
