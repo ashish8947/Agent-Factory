@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go-rag/internal/rag"
+	"github.com/ashish8947/Agent-Factory/go-rag/internal/rag"
 )
 
 type Server struct{}

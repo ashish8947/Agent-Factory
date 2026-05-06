@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go-rag/internal/api"
+	"github.com/ashish8947/Agent-Factory/go-rag/internal/api"
 )
 
 func main() {
